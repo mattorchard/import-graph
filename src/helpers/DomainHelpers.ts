@@ -38,7 +38,7 @@ export const createImportGraph = async (
   const uidLookup = new Map(
     [...sourceFileTree.entries()].map(([, handle]) => [handle, createId()])
   );
-  const resolver = new ImportResolver();
+  const resolver = new ImportResolver([...sourceFileExtensions, null]);
   const importGraph = new Graph<string>();
   for (const [path, handle] of sourceFileTree.entries()) {
     const folderPath = path.slice(0, -1);
