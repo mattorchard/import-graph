@@ -31,6 +31,18 @@ export class TreeMap<KeyType, LeafType> {
     return currentNode?.hasValue ? (currentNode!.value as LeafType) : undefined;
   }
 
+  public *keys() {
+    for (const [key] of this.entries()) {
+      yield key;
+    }
+  }
+
+  public *values() {
+    for (const [, value] of this.entries()) {
+      yield value;
+    }
+  }
+
   public *entries(): Generator<[KeyType[], LeafType]> {
     yield* this.iterEntries(this.root, []);
   }

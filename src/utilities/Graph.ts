@@ -7,7 +7,7 @@ export class Graph<T> {
     this.adjacencyMatrix.get(start)!.add(end);
   }
 
-  private addNode(node: T) {
+  public addNode(node: T) {
     if (!this.adjacencyMatrix.has(node)) {
       this.adjacencyMatrix.set(node, new Set());
     }
@@ -37,5 +37,10 @@ export class Graph<T> {
         yield [source, target] as const;
       }
     }
+  }
+
+  public *getConnectedNodes(node: T) {
+    if (!this.adjacencyMatrix.has(node)) return;
+    yield* this.adjacencyMatrix.get(node)!;
   }
 }

@@ -3,28 +3,29 @@ import { getFileExtension, removeFileExtension } from "../helpers/FileHelpers";
 
 export class ImportResolver {
   private readonly separator = "/";
-  private readonly isAllowedFileExtension: (item: string | null) => boolean;
 
-  constructor(allowedFileExtensions: Array<string | null>) {
-    this.isAllowedFileExtension = isOneOf(allowedFileExtensions);
-  }
+  constructor(
+    private readonly options: {
+      isAllowedFileExtension: (extension: string | null) => boolean;
+      rootAliases: Map<string, string[]>;
+    }
+  ) {}
 
   public resolve(startPath: string[], rawImportPath: string): string[] | null {
     const importParts = rawImportPath.split(this.separator);
-    // Probably a package import, should be more specific once aliases supported
-    if (importParts.every(isNotOneOf([".", ".."]))) return null;
 
     const fileName = importParts.at(-1);
-    if (!fileName || !this.isAllowedFileExtension(getFileExtension(fileName)))
+    if (!fileName) return null;
+    if (!this.options.isAllowedFileExtension(getFileExtension(fileName)))
       return null;
 
-    const allImportSegments = [
+    const allPathSegments = [
       ...startPath,
-      ...importParts.slice(0, 1),
+      ...this.applyAliases(importParts).slice(0, -1),
       removeFileExtension(fileName),
     ];
     const resolvedPath = new Array<string>();
-    for (const part of allImportSegments) {
+    for (const part of allPathSegments) {
       switch (part) {
         case ".":
           break;
@@ -37,5 +38,15 @@ export class ImportResolver {
       }
     }
     return resolvedPath;
+  }
+
+  private applyAliases(importParts: string[]) {
+    const [rootSegment] = importParts;
+    if (!this.options.rootAliases.has(rootSegment)) return importParts;
+
+    return [
+      ...this.options.rootAliases.get(rootSegment)!,
+      ...importParts.slice(1),
+    ];
   }
 }

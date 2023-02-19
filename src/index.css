@@ -42,3 +42,28 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+* {
+  padding: 0;
+}
+ol,
+li {
+  list-style: none;
+}
+
+.walk {
+  display: flex;
+  gap: 0.5rem;
+  font-family: monospace;
+}
+.walk__item {
+  white-space: pre;
+}
+.walk__item + .walk__item::before {
+  content: "->";
+  margin-right: 0.5rem;
+}
+.walk__item__path {
+  color: #ffffff60;
+}
+.walk__item__name {
+}
