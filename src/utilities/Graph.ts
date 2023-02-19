@@ -13,7 +13,7 @@ export class Graph<T> {
     }
   }
 
-  public calculateReverseAdjacencies() {
+  public createInverseGraph() {
     const reverse = new Graph<T>();
     for (const [source, targets] of this.adjacencyMatrix.entries()) {
       for (const target of targets) {
@@ -21,5 +21,21 @@ export class Graph<T> {
       }
     }
     return reverse;
+  }
+
+  public hasEdge(a: T, b: T) {
+    return !!this.adjacencyMatrix.get(a)?.has(b);
+  }
+
+  public nodes() {
+    return this.adjacencyMatrix.keys();
+  }
+
+  public *edges() {
+    for (const [source, targets] of this.adjacencyMatrix.entries()) {
+      for (const target of targets) {
+        yield [source, target] as const;
+      }
+    }
   }
 }

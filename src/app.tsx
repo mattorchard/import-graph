@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
+import { GraphViz } from "./components/GraphViz";
 import {
   createImportGraph,
   createSourceFileTree,
@@ -23,6 +24,7 @@ export function App() {
   return (
     <main onClick={handleClick}>
       <button>Pick Folder</button>
+      {graph && <GraphViz graph={graph} />}
       <code>
         <pre>{prettyJson(graph)}</pre>
       </code>
