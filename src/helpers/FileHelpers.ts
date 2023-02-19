@@ -21,3 +21,18 @@ export const readBlob = (blob: Blob): Promise<string> =>
         : reject(new Error(`File not able to be read as text`));
     reader.readAsText(blob);
   });
+
+export const downloadBlob = (blob: Blob, fileName?: string) => {
+  const url = URL.createObjectURL(blob);
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName ?? "true";
+    a.setAttribute("hidden", "true");
+    a.click();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+};
+
+export const downloadFile = (file: File) => downloadBlob(file, file.name);

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 
 import { buildSearchableWalks, Doc } from "./helpers/DomainHelpers";
+import { exportDocs } from "./helpers/ExportHelpers";
 
 export function App() {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null);
@@ -24,6 +25,11 @@ export function App() {
         <button onClick={handlePickFolder}>
           {root ? "Reselect Folder" : "Select Folder"}
         </button>
+        {docWalks && (
+          <button type="button" onClick={() => exportDocs(docWalks)}>
+            Download
+          </button>
+        )}
       </header>
       <main>
         <form>
