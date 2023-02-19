@@ -47,21 +47,21 @@ export class ScalableForceDirectedPlacementLayout {
   }
 
   private getInterPointForce(a: Point, b: Point, isNeighbor: boolean) {
-    const strength = isNeighbor
-      ? this.getAttractionForce(a, b)
-      : this.getRepulsionForce(a, b);
+    const distance = getMagnitude(subtractPoints(a, b));
+    const strength =
+      isNeighbor && distance > 10 // Todo: More rsesearch
+        ? this.getAttractionForce(distance)
+        : this.getRepulsionForce(distance);
 
     return this.directionalizeForce(a, b, strength);
   }
 
-  private getAttractionForce(a: Point, b: Point): number {
-    return (
-      getMagnitude(subtractPoints(a, b)) ** 2 / this.options.springConstant
-    );
+  private getAttractionForce(distance: number): number {
+    return distance ** 2 / this.options.springConstant;
   }
 
-  private getRepulsionForce(a: Point, b: Point): number {
-    return this.repulsiveForceFactor / getMagnitude(subtractPoints(a, b));
+  private getRepulsionForce(distance: number): number {
+    return this.repulsiveForceFactor / distance;
   }
 
   private normalizeForce(a: Point): Point {
