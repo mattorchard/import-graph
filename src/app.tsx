@@ -9,7 +9,7 @@ import { createWalkFilter, QueryRecord } from "./helpers/SearchHelpers";
 
 export function App() {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null);
-  const [docWalks, setDocWalks] = useState<Doc[][] | null>(null);
+  const [allDocWalks, setAllDocWalks] = useState<Doc[][] | null>(null);
   const [queries, setQueries] = useState<QueryRecord>({
     start: "",
     middle: "",
@@ -18,19 +18,19 @@ export function App() {
 
   useEffect(() => {
     if (!root) return;
-    buildSearchableWalks(root).then(setDocWalks);
+    buildSearchableWalks(root).then(setAllDocWalks);
   }, [root]);
 
   const walkFilter = useMemo(() => createWalkFilter(queries), [queries]);
 
   const filteredWalks = useMemo(() => {
-    if (!docWalks) return null;
-    if (!walkFilter) return docWalks;
-    return docWalks.filter(walkFilter);
-  }, [docWalks, queries]);
+    if (!allDocWalks) return null;
+    if (!walkFilter) return allDocWalks;
+    return allDocWalks.filter(walkFilter);
+  }, [allDocWalks, queries]);
 
   const handlePickFolder = async () => {
-    setDocWalks(null);
+    setAllDocWalks(null);
     setRoot(await window.showDirectoryPicker());
   };
 
@@ -38,11 +38,11 @@ export function App() {
     <div className="app">
       <header className="app__header">
         <h1>Import Graph</h1>
-        {docWalks && (
+        {filteredWalks && (
           <div className="app__header__actions">
             <button type="button">Set aliases</button>
 
-            <button type="button" onClick={() => exportDocs(docWalks)}>
+            <button type="button" onClick={() => exportDocs(filteredWalks)}>
               Download
             </button>
 
@@ -65,10 +65,10 @@ export function App() {
         )}
       </main>
       <footer className="app__footer">
-        {walkFilter && filteredWalks && (
+        {allDocWalks !== filteredWalks && filteredWalks && (
           <>{filteredWalks.length}&nbsp;/&nbsp;</>
         )}
-        {docWalks && <>{docWalks.length} Chains</>}
+        {allDocWalks && <>{allDocWalks.length} Chains</>}
       </footer>
     </div>
   );
