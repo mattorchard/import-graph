@@ -7,6 +7,7 @@ import { createId } from "./IdHelpers";
 import { AliasMap, ImportResolver } from "../utilities/ImportResolver";
 import { Graph } from "../utilities/Graph";
 import { SafeMap } from "../utilities/SafeMap";
+import { FileNotFoundWarnings } from "../utilities/FileNotFoundWarnings";
 
 export const sourceFileExtensions = ["js", "jsx", "mjs", "ts", "tsx"];
 
@@ -61,7 +62,7 @@ export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
 };
 
 export const createImportGraph = async (
-  sourceFileTree: TreeMap<string, Doc>,
+  docTree: TreeMap<string, Doc>,
   rootAliases: AliasMap = new Map()
 ) => {
   const resolver = new ImportResolver({
@@ -69,20 +70,34 @@ export const createImportGraph = async (
     rootAliases,
   });
   const importGraph = new Graph<string>();
-  for (const doc of sourceFileTree.values()) {
+  const warnings = new FileNotFoundWarnings();
+  for (const doc of docTree.values()) {
     importGraph.addNode(doc.id);
 
     for (const rawImport of await parseRawImports(doc.handle)) {
-      // Todo: Emit warnings
       const resolvedImportPath = resolver.resolve(doc.folderParts, rawImport);
-      if (!resolvedImportPath) continue;
+      if (!resolvedImportPath) {
+        continue;
+      }
 
-      // Todo: Emit warnings
-      const importedDoc = sourceFileTree.get(resolvedImportPath);
-      if (!importedDoc) continue;
+      const importedDoc =
+        docTree.get(resolvedImportPath) ??
+        docTree.get([...resolvedImportPath, "index"]);
+      if (!importedDoc) {
+        warnings.add({
+          resolvedImportPath,
+          rawImport,
+          folderParts: doc.folderParts,
+        });
+        continue;
+      }
 
       importGraph.addEdge(doc.id, importedDoc.id);
     }
+  }
+
+  if (warnings.size > 0) {
+    console.warn(warnings.toString());
   }
   return importGraph;
 };

@@ -16,7 +16,6 @@ export class ImportResolver {
     const importParts = rawImportPath.split(this.separator).filter(Boolean);
 
     const fileName = importParts.at(-1);
-    // Todo: Emit warnings
     if (!fileName) return null;
     if (!this.options.isAllowedFileExtension(getFileExtension(fileName)))
       return null;
