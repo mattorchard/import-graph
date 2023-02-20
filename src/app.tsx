@@ -77,12 +77,8 @@ export function App() {
         {filteredWalks ? (
           <WalkList walks={filteredWalks} isPathVisible={isPathVisible} />
         ) : (
-          <div className="hero__container">
-            <button
-              type="button"
-              onClick={handlePickFolder}
-              className="hero__button"
-            >
+          <div className="hero__container" onClick={handlePickFolder}>
+            <button type="button" className="hero__button">
               Choose a folder
             </button>
           </div>
