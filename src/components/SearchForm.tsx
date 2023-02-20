@@ -1,6 +1,7 @@
 import { FunctionComponent } from "preact";
 import { useMemo } from "preact/hooks";
 import { QueryRecord } from "../helpers/SearchHelpers";
+import { countChar } from "../helpers/TextHelpers";
 import { createDebounced } from "../helpers/TimingHelpers";
 
 export const SearchForm: FunctionComponent<{
@@ -26,7 +27,10 @@ export const SearchForm: FunctionComponent<{
         onChangeHandlers.immediate(e.currentTarget);
       }}
       onBlur={(e) => onChangeHandlers.immediate(e.currentTarget)}
-      onChange={(e) => onChangeHandlers.immediate(e.currentTarget)}
+      onChange={(e) => {
+        console.debug("Change events");
+        return onChangeHandlers.immediate(e.currentTarget);
+      }}
       onInput={(e) => onChangeHandlers.debounced(e.currentTarget)}
     >
       <SearchInput label="Start" />
@@ -37,11 +41,14 @@ export const SearchForm: FunctionComponent<{
 };
 
 const SearchInput: FunctionComponent<{ label: string }> = ({ label }) => (
-  <input
+  <textarea
     className="search-form__search-input"
-    type="search"
     name={label.toLowerCase()}
     aria-label={label}
     placeholder={label}
+    onInput={(e) => {
+      const lineCount = 1 + countChar(e.currentTarget.value, "\n");
+      e.currentTarget.style.setProperty("--line-count", lineCount.toString());
+    }}
   />
 );

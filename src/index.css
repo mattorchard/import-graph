@@ -106,10 +106,6 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
 }
-.search-form__search-input {
-  font-size: 2rem;
-  padding: 0.5rem;
-}
 
 dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.36);
@@ -152,4 +148,14 @@ dialog {
   padding: 0.5rem;
   display: grid;
   grid-template-columns: auto auto;
+}
+
+.search-form__search-input {
+  font-size: 2rem;
+  padding: 0.5rem;
+  resize: none;
+  --line-count: 1;
+  height: calc(1rem + 2rem * var(--line-count));
+  overflow: auto;
+  max-height: calc(1rem + 2rem * 10);
 }

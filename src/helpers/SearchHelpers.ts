@@ -1,11 +1,14 @@
 import { Doc } from "./DomainHelpers";
 
 const createDocCondition = (query: string): ((doc: Doc) => boolean) => {
-  const cleanQuery = query.toLowerCase().trim();
-  if (!cleanQuery) return () => true;
+  const querySegments = query
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (query.length === 0) return () => true;
 
-  const regExp = new RegExp(cleanQuery, "i");
-  return (doc) => regExp.test(doc.searchTarget);
+  const patterns = querySegments.map((segment) => new RegExp(segment, "i"));
+  return (doc) => patterns.some((pattern) => pattern.test(doc.searchTarget));
 };
 
 type QueryFields = "start" | "anywhere" | "end";
@@ -31,8 +34,8 @@ export const createWalkFilter = (queries: QueryRecord) => {
   }
 
   if (queries.anywhere.trim()) {
-    const middleCondition = createDocCondition(queries.anywhere);
-    conditions.push((walk) => walk.some((doc) => middleCondition(doc)));
+    const anywhereCondition = createDocCondition(queries.anywhere);
+    conditions.push((walk) => walk.some((doc) => anywhereCondition(doc)));
   }
   if (conditions.length === 0) return null;
   return (walk: Doc[]) => conditions.every((filter) => filter(walk));
