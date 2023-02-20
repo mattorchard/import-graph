@@ -47,13 +47,18 @@ li {
 button {
   padding: 0.5rem 0.5rem;
   cursor: pointer;
+  background-color: var(--color-primary);
 }
 button,
 input,
 textarea {
-  background-color: var(--color-primary);
   border-top-right-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
+}
+input,
+textarea {
+  border: 0.25rem solid var(--color-primary);
+  background: none;
 }
 
 ::placeholder {
@@ -176,9 +181,9 @@ dialog {
   padding: 0.5rem;
   resize: none;
   --line-count: 1;
-  height: calc(1rem + 2rem * var(--line-count));
+  height: calc(1.5rem + 2rem * var(--line-count));
   overflow: auto;
-  max-height: calc(1rem + 2rem * 10);
+  max-height: calc(1.5rem + 2rem * 10);
 }
 
 ::selection {
