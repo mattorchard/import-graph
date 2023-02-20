@@ -1,5 +1,6 @@
-import { isNotOneOf, isOneOf } from "../helpers/CollectionHelpers";
 import { getFileExtension, removeFileExtension } from "../helpers/FileHelpers";
+
+export type AliasMap = Map<string, string[]>;
 
 export class ImportResolver {
   private readonly separator = "/";
@@ -7,14 +8,15 @@ export class ImportResolver {
   constructor(
     private readonly options: {
       isAllowedFileExtension: (extension: string | null) => boolean;
-      rootAliases: Map<string, string[]>;
+      rootAliases: AliasMap;
     }
   ) {}
 
   public resolve(startPath: string[], rawImportPath: string): string[] | null {
-    const importParts = rawImportPath.split(this.separator);
+    const importParts = rawImportPath.split(this.separator).filter(Boolean);
 
     const fileName = importParts.at(-1);
+    // Todo: Emit warnings
     if (!fileName) return null;
     if (!this.options.isAllowedFileExtension(getFileExtension(fileName)))
       return null;
@@ -43,7 +45,6 @@ export class ImportResolver {
   private applyAliases(importParts: string[]) {
     const [rootSegment] = importParts;
     if (!this.options.rootAliases.has(rootSegment)) return importParts;
-
     return [
       ...this.options.rootAliases.get(rootSegment)!,
       ...importParts.slice(1),

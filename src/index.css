@@ -110,3 +110,46 @@ button {
   font-size: 2rem;
   padding: 0.5rem;
 }
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(2px);
+}
+dialog {
+  margin: auto;
+  background-color: transparent;
+}
+.alias-dialog__form {
+  padding: 1rem;
+  background-color: #242424;
+}
+
+.alias-dialog__textarea {
+  width: 72ch;
+  height: 10rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  display: block;
+}
+
+.hero__container {
+  display: flex;
+  width: 100%;
+}
+.hero__button {
+  margin: auto;
+  font-size: 4rem;
+  padding: 1rem;
+}
+
+.alias-dialog__label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.alias-dialog__output-dl {
+  font-family: monospace;
+  padding: 0.5rem;
+  display: grid;
+  grid-template-columns: auto auto;
+}

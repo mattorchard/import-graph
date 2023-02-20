@@ -32,6 +32,11 @@ const createDocCondition = (query: string): ((doc: Doc) => boolean) => {
 type QueryFields = "start" | "middle" | "end";
 
 export type QueryRecord = Record<QueryFields, string>;
+export const EmptyQueryRecord: QueryRecord = {
+  start: "",
+  middle: "",
+  end: "",
+} as const;
 
 export const createWalkFilter = (queries: QueryRecord) => {
   const conditions = new Array<(walk: Doc[]) => boolean>();

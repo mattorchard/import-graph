@@ -1,25 +1,28 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
-import { Fragment } from "preact/jsx-runtime";
+import { AliasDialog } from "./components/AliasDialog";
 import { SearchForm } from "./components/SearchForm";
 import { WalkList } from "./components/WalkList";
 
 import { buildSearchableWalks, Doc } from "./helpers/DomainHelpers";
 import { exportDocs } from "./helpers/ExportHelpers";
-import { createWalkFilter, QueryRecord } from "./helpers/SearchHelpers";
+import {
+  createWalkFilter,
+  EmptyQueryRecord,
+  QueryRecord,
+} from "./helpers/SearchHelpers";
+import { AliasMap } from "./utilities/ImportResolver";
 
 export function App() {
   const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null);
   const [allDocWalks, setAllDocWalks] = useState<Doc[][] | null>(null);
-  const [queries, setQueries] = useState<QueryRecord>({
-    start: "",
-    middle: "",
-    end: "",
-  });
+  const [queries, setQueries] = useState<QueryRecord>(EmptyQueryRecord);
+  const [isAliasDialogOpen, setIsAliasDialogOpen] = useState(false);
+  const [rootAliases, setRootAliases] = useState<AliasMap>(new Map());
 
   useEffect(() => {
     if (!root) return;
-    buildSearchableWalks(root).then(setAllDocWalks);
-  }, [root]);
+    buildSearchableWalks(root, rootAliases).then(setAllDocWalks);
+  }, [root, rootAliases]);
 
   const walkFilter = useMemo(() => createWalkFilter(queries), [queries]);
 
@@ -38,9 +41,17 @@ export function App() {
     <div className="app">
       <header className="app__header">
         <h1>Import Graph</h1>
+        <AliasDialog
+          isOpen={isAliasDialogOpen}
+          onClose={() => setIsAliasDialogOpen(false)}
+          aliases={rootAliases}
+          onChange={setRootAliases}
+        />
         {filteredWalks && (
           <div className="app__header__actions">
-            <button type="button">Set aliases</button>
+            <button type="button" onClick={() => setIsAliasDialogOpen(true)}>
+              Configure aliases
+            </button>
 
             <button type="button" onClick={() => exportDocs(filteredWalks)}>
               Download
@@ -53,12 +64,16 @@ export function App() {
         )}
       </header>
       <main className="app__content">
-        <SearchForm onChange={setQueries} />
+        {root ? <SearchForm onChange={setQueries} /> : <div />}
         {filteredWalks ? (
           <WalkList walks={filteredWalks} />
         ) : (
-          <div>
-            <button type="button" onClick={handlePickFolder}>
+          <div className="hero__container">
+            <button
+              type="button"
+              onClick={handlePickFolder}
+              className="hero__button"
+            >
               Choose a folder
             </button>
           </div>

@@ -4,7 +4,7 @@ import { getFileExtension, readBlob, removeFileExtension } from "./FileHelpers";
 import { getImportModuleSpecifiers } from "./ParserHelpers";
 import { TreeMap } from "../utilities/TreeMap";
 import { createId } from "./IdHelpers";
-import { ImportResolver } from "../utilities/ImportResolver";
+import { AliasMap, ImportResolver } from "../utilities/ImportResolver";
 import { Graph } from "../utilities/Graph";
 import { SafeMap } from "../utilities/SafeMap";
 
@@ -41,7 +41,7 @@ export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
 
 export const createImportGraph = async (
   sourceFileTree: TreeMap<string, Doc>,
-  rootAliases = new Map<string, string[]>()
+  rootAliases: AliasMap = new Map()
 ) => {
   const resolver = new ImportResolver({
     isAllowedFileExtension: isOneOf([...sourceFileExtensions, null]),
@@ -53,9 +53,11 @@ export const createImportGraph = async (
     importGraph.addNode(doc.id);
 
     for (const rawImport of await parseRawImports(doc.handle)) {
+      // Todo: Emit warnings
       const resolvedImportPath = resolver.resolve(folderPath, rawImport);
       if (!resolvedImportPath) continue;
 
+      // Todo: Emit warnings
       const importedDoc = sourceFileTree.get(resolvedImportPath);
       if (!importedDoc) continue;
 
@@ -86,9 +88,12 @@ export const findAllWalks = <T>(graph: Graph<T>) => {
   return [...walksByNode.keys()].filter((walk) => walk.length > 1);
 };
 
-export const buildSearchableWalks = async (root: FileSystemDirectoryHandle) => {
+export const buildSearchableWalks = async (
+  root: FileSystemDirectoryHandle,
+  rootAliases: AliasMap
+) => {
   const fileTree = await createSourceFileTree(root);
-  const importGraph = await createImportGraph(fileTree);
+  const importGraph = await createImportGraph(fileTree, rootAliases);
   const allWalks = findAllWalks(importGraph);
   const idLookup = new SafeMap(
     [...fileTree.values()].map((doc) => [doc.id, doc])
