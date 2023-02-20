@@ -18,6 +18,7 @@ export function App() {
   const [queries, setQueries] = useState<QueryRecord>(EmptyQueryRecord);
   const [isAliasDialogOpen, setIsAliasDialogOpen] = useState(false);
   const [rootAliases, setRootAliases] = useState<AliasMap>(new Map());
+  const [isPathVisible, setIsPathVisible] = useState(true);
 
   useEffect(() => {
     if (!root) return;
@@ -49,6 +50,14 @@ export function App() {
         />
         {filteredWalks && (
           <div className="app__header__actions">
+            <label>
+              <input
+                type="checkbox"
+                checked={isPathVisible}
+                onChange={(e) => setIsPathVisible(e.currentTarget.checked)}
+              />
+              Show paths
+            </label>
             <button type="button" onClick={() => setIsAliasDialogOpen(true)}>
               Configure aliases
             </button>
@@ -66,7 +75,7 @@ export function App() {
       <main className="app__content">
         {root ? <SearchForm onChange={setQueries} /> : <div />}
         {filteredWalks ? (
-          <WalkList walks={filteredWalks} />
+          <WalkList walks={filteredWalks} isPathVisible={isPathVisible} />
         ) : (
           <div className="hero__container">
             <button

@@ -1,8 +1,15 @@
 :root {
+  --color-text: rgba(255, 255, 255, 0.87);
+  --color-text-subtle: rgba(255, 255, 255, 0.5);
+  --color-background: #1e212b;
+  --color-primary: #912f40;
+  --color-selection: #6e75a8;
+}
+:root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   color-scheme: dark light;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--color-text);
+  background-color: var(--color-background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -41,6 +48,17 @@ button {
   padding: 0.5rem 0.5rem;
   cursor: pointer;
 }
+button,
+input,
+textarea {
+  background-color: var(--color-primary);
+  border-top-right-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}
+
+::placeholder {
+  color: var(--color-text-subtle);
+}
 .app {
   height: 100vh;
   max-height: 100vh;
@@ -74,16 +92,18 @@ button {
 .app__header__actions {
   margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 0.5rem;
+}
+input[type="checkbox"] {
+  margin-right: 0.25rem;
 }
 .walk-list__container {
   overflow: scroll;
   padding-left: 0.5rem;
 }
-.walk-list__item {
-}
 .walk-list__item[data-is-even="true"] {
-  background-color: #ffffff02;
+  background-color: #ffffff04;
 }
 .walk {
   display: flex;
@@ -94,11 +114,12 @@ button {
   white-space: pre;
 }
 .walk__item + .walk__item::before {
-  content: "->";
+  content: "🠪";
+  color: var(--color-primary);
   margin-right: 0.5rem;
 }
 .walk__item__path {
-  color: #ffffff60;
+  color: var(--color-text-subtle);
 }
 .search-form {
   padding: 0 0.5rem;
@@ -117,7 +138,7 @@ dialog {
 }
 .alias-dialog__form {
   padding: 1rem;
-  background-color: #242424;
+  background-color: var(--color-background);
 }
 
 .alias-dialog__textarea {
@@ -158,4 +179,8 @@ dialog {
   height: calc(1rem + 2rem * var(--line-count));
   overflow: auto;
   max-height: calc(1rem + 2rem * 10);
+}
+
+::selection {
+  background-color: var(--color-selection);
 }
