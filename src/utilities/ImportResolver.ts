@@ -20,6 +20,8 @@ export class ImportResolver {
     if (!this.options.isAllowedFileExtension(getFileExtension(fileName)))
       return null;
 
+    if (this.isPackageImport(importParts)) return null;
+
     const allPathSegments = [
       ...startPath,
       ...this.applyAliases(importParts).slice(0, -1),
@@ -39,6 +41,13 @@ export class ImportResolver {
       }
     }
     return resolvedPath;
+  }
+  private isPackageImport(importParts: string[]) {
+    const [rootSegment] = importParts;
+    if (this.options.rootAliases.has(rootSegment)) return false;
+    if (rootSegment === ".") return false;
+    if (rootSegment === "..") return false;
+    return true;
   }
 
   private applyAliases(importParts: string[]) {
