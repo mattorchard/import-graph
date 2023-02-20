@@ -1,0 +1,11 @@
+.virtualized-list {
+  position: relative;
+  height: calc(var(--item-height) * var(--item-count) * 1px);
+}
+.virtualized-list__item {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--item-height) * 1px);
+  top: calc(var(--item-height) * var(--item-index) * 1px);
+}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
+import { WalkList } from "./components/WalkList";
 
 import { buildSearchableWalks, Doc } from "./helpers/DomainHelpers";
 import { exportDocs } from "./helpers/ExportHelpers";
@@ -19,47 +20,38 @@ export function App() {
   };
 
   return (
-    <Fragment>
-      <header>
+    <div className="app">
+      <header className="app__header">
         <h1>Import Graph</h1>
-        <button onClick={handlePickFolder}>
-          {root ? "Reselect Folder" : "Select Folder"}
-        </button>
         {docWalks && (
-          <button type="button" onClick={() => exportDocs(docWalks)}>
-            Download
-          </button>
+          <>
+            <button type="button" onClick={handlePickFolder}>
+              Choose a different folder
+            </button>
+
+            <button type="button" onClick={() => exportDocs(docWalks)}>
+              Download
+            </button>
+          </>
         )}
       </header>
-      <main>
+      <main className="app__content">
         <form>
           <label>
             Query:
             <input type="search" />
           </label>
         </form>
-        <ul className="walk-list">
-          {docWalks?.map((walk, index) => (
-            <li key={index} className="walk-list__item">
-              <ol className="walk">
-                {walk.map((doc) => (
-                  <li key={doc.id} className="walk__item">
-                    <code>
-                      <span className="walk__item__path">
-                        {doc.path.slice(0, -1).join("/")}
-                        {doc.path.length !== 1 && "/"}
-                      </span>
-                      <span className="walk__item__name">
-                        {doc.handle.name}
-                      </span>
-                    </code>
-                  </li>
-                ))}
-              </ol>
-            </li>
-          ))}
-        </ul>
+        {docWalks ? (
+          <WalkList walks={docWalks} />
+        ) : (
+          <div>
+            <button type="button" onClick={handlePickFolder}>
+              Choose a folder
+            </button>
+          </div>
+        )}
       </main>
-    </Fragment>
+    </div>
   );
 }
