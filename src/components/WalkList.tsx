@@ -15,10 +15,10 @@ export const WalkList: FunctionComponent<{ walks: Doc[][] }> = ({ walks }) => {
         {walk.map((doc) => (
           <li key={doc.id} className="walk__item">
             <span className="walk__item__path">
-              {doc.path.slice(0, -1).join("/")}
-              {doc.path.length !== 1 && "/"}
+              {doc.folderParts.join("/")}
+              {doc.folderParts.length > 0 && "/"}
             </span>
-            <span className="walk__item__name">{doc.handle.name}</span>
+            <span className="walk__item__name">{doc.name}</span>
           </li>
         ))}
       </ol>

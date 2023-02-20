@@ -13,5 +13,4 @@ export const exportDocs = (walks: Doc[][]) => {
     )
   );
 };
-const docToCell = (doc: Doc) =>
-  [...doc.path.slice(0, -1), doc.handle.name].join("/");
+const docToCell = (doc: Doc) => [...doc.folderParts, doc.name].join("/");

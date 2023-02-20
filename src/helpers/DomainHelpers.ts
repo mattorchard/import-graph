@@ -22,7 +22,11 @@ const createExplorer = () => {
 
 export interface Doc {
   id: string;
-  path: string[];
+  parts: string[];
+  folderParts: string[];
+  stem: string;
+  name: string;
+  extension: string | null;
   handle: FileSystemFileHandle;
 }
 
@@ -32,9 +36,16 @@ export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
     console.warn("FileTree warnings", warnings);
   }
   return new TreeMap<string, Doc>(
-    [...fileTree.entries()].map(([basePath, handle]) => {
-      const path = [...basePath.slice(0, -1), removeFileExtension(handle.name)];
-      return [path, { handle, path, id: createId() }];
+    [...fileTree.entries()].map(([parts, handle]) => {
+      const folderParts = parts.slice(0, -1);
+      const name = parts.at(-1)!;
+      const stem = removeFileExtension(name);
+      const extension = getFileExtension(name);
+      const indexedPath = [...folderParts, stem];
+      return [
+        indexedPath,
+        { id: createId(), parts, folderParts, stem, name, extension, handle },
+      ];
     })
   );
 };
@@ -48,13 +59,12 @@ export const createImportGraph = async (
     rootAliases,
   });
   const importGraph = new Graph<string>();
-  for (const [path, doc] of sourceFileTree.entries()) {
-    const folderPath = path.slice(0, -1);
+  for (const doc of sourceFileTree.values()) {
     importGraph.addNode(doc.id);
 
     for (const rawImport of await parseRawImports(doc.handle)) {
       // Todo: Emit warnings
-      const resolvedImportPath = resolver.resolve(folderPath, rawImport);
+      const resolvedImportPath = resolver.resolve(doc.folderParts, rawImport);
       if (!resolvedImportPath) continue;
 
       // Todo: Emit warnings
