@@ -28,6 +28,7 @@ export interface Doc {
   name: string;
   extension: string | null;
   handle: FileSystemFileHandle;
+  searchTarget: string;
 }
 
 export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
@@ -44,7 +45,16 @@ export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
       const indexedPath = [...folderParts, stem];
       return [
         indexedPath,
-        { id: createId(), parts, folderParts, stem, name, extension, handle },
+        {
+          id: createId(),
+          parts,
+          folderParts,
+          stem,
+          name,
+          extension,
+          handle,
+          searchTarget: parts.join("/"),
+        },
       ];
     })
   );

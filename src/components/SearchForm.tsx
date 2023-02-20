@@ -12,7 +12,7 @@ export const SearchForm: FunctionComponent<{
         const formData = new FormData(form);
         onChange({
           start: (formData.get("start") as string) || "",
-          middle: (formData.get("middle") as string) || "",
+          anywhere: (formData.get("anywhere") as string) || "",
           end: (formData.get("end") as string) || "",
         });
       }, 300),
@@ -30,7 +30,7 @@ export const SearchForm: FunctionComponent<{
       onInput={(e) => onChangeHandlers.debounced(e.currentTarget)}
     >
       <SearchInput label="Start" />
-      <SearchInput label="Middle" />
+      <SearchInput label="Anywhere" />
       <SearchInput label="End" />
     </form>
   );
