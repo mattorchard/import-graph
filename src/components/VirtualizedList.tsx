@@ -87,6 +87,8 @@ const VirtualizedListInner = memo(
         {itemsToRender.map((item, index) => (
           <li
             key={indexOffset + index}
+            data-is-even={(indexOffset + index) % 2 === 0}
+            data-is-odd={(indexOffset + index) % 2 === 1}
             className={`virtualized-list__item ${itemClassName}`}
             style={{ "--item-index": indexOffset + index }}
           >
