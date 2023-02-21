@@ -3,12 +3,13 @@ import { useCallback, useRef } from "preact/hooks";
 import { Doc } from "../helpers/DomainHelpers";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import { useScrollState } from "../hooks/useScrollState";
+import { DocPath } from "./DocPath";
 import { VirtualizedList } from "./VirtualizedList";
 
 export const WalkList: FunctionComponent<{
   walks: Doc[][];
-  isPathVisible: boolean;
-}> = ({ walks, isPathVisible }) => {
+  isFolderVisible: boolean;
+}> = ({ walks, isFolderVisible }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const containerSize = useResizeObserver(containerRef);
   const [scrollState, onScroll] = useScrollState();
@@ -17,23 +18,12 @@ export const WalkList: FunctionComponent<{
       <ol className="walk">
         {walk.map((doc) => (
           <li key={doc.id} className="walk__item">
-            {isPathVisible && (
-              <span className="walk__item__path">
-                {doc.folderParts.join("/")}
-                {doc.folderParts.length > 0 && "/"}
-              </span>
-            )}
-            <span
-              className="walk__item__name"
-              title={isPathVisible ? "" : doc.searchTarget}
-            >
-              {doc.name}
-            </span>
+            <DocPath doc={doc} isFolderVisible={isFolderVisible} />
           </li>
         ))}
       </ol>
     ),
-    [isPathVisible]
+    [isFolderVisible]
   );
   return (
     <div

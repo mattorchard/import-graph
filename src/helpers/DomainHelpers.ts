@@ -32,7 +32,7 @@ export interface Doc {
   searchTarget: string;
 }
 
-export const createSourceFileTree = async (root: FileSystemDirectoryHandle) => {
+export const createDocTree = async (root: FileSystemDirectoryHandle) => {
   const { fileTree, warnings } = await createExplorer().explore(root);
   if (warnings.length) {
     console.warn("FileTree warnings", warnings);
@@ -123,17 +123,24 @@ export const findAllWalks = <T>(graph: Graph<T>) => {
   return [...walksByNode.keys()].filter((walk) => walk.length > 1);
 };
 
-export const buildSearchableWalks = async (
+export const createJunk = async (
   root: FileSystemDirectoryHandle,
   rootAliases: AliasMap
 ) => {
-  const fileTree = await createSourceFileTree(root);
-  const importGraph = await createImportGraph(fileTree, rootAliases);
+  const docTree = await createDocTree(root);
+  const importGraph = await createImportGraph(docTree, rootAliases);
   const allWalks = findAllWalks(importGraph);
   const idLookup = new SafeMap(
-    [...fileTree.values()].map((doc) => [doc.id, doc])
+    [...docTree.values()].map((doc) => [doc.id, doc])
   );
-  return allWalks.map((walk) => walk.map((id) => idLookup.get(id)));
+  const searchableWalks = allWalks.map((walk) =>
+    walk.map((id) => idLookup.get(id))
+  );
+  return {
+    searchableWalks,
+    importGraph,
+    docTree,
+  };
 };
 
 const parseRawImports = async (handle: FileSystemFileHandle) =>

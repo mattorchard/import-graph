@@ -6,10 +6,10 @@ export class GraphPositionStateManager<T> {
   private layout = new ScalableForceDirectedPlacementLayout({
     springConstant: 2,
     repulsiveConstant: 25,
-    gravityConstant: 0.5,
+    gravityConstant: 1,
   });
   private positions: SafeMap<T, { x: number; y: number }>;
-  constructor(private readonly graph: Graph<T>) {
+  constructor(public readonly graph: Graph<T>) {
     this.positions = new SafeMap(
       [...graph.nodes()].map((node, index, allNodes) => {
         const nodeCount = allNodes.length;

@@ -1,5 +1,6 @@
 import { Fragment, FunctionComponent } from "preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
+import { createRafLoop } from "../helpers/AnimationHelpers";
 import {
   calculateBounds,
   getAngleBetween,
@@ -16,23 +17,16 @@ import { GraphPositionStateManager } from "../utilities/GraphPositionStateManage
 export const GraphViz: FunctionComponent<{ graph: Graph<string> }> = ({
   graph,
 }) => {
-  const positionManager = useMemo(
-    () => new GraphPositionStateManager(graph),
-    [graph]
+  const [positionManager, setPositionManager] = useState(
+    () => new GraphPositionStateManager(graph)
   );
-  const [positionMap, setPositionMap] = useState(() =>
-    positionManager.tick(1_000)
-  );
+  const [positionMap, setPositionMap] = useState(() => positionManager.tick());
   useEffect(() => {
-    const intervalId = window.setInterval(
-      () => setPositionMap(positionManager.tick(3)),
-      20
-    );
-    setTimeout(() => {
-      window.clearInterval(intervalId);
-    }, 3_000);
-    return () => window.clearInterval(intervalId);
-  }, [positionManager]);
+    const manager = new GraphPositionStateManager(graph);
+    setPositionManager(manager);
+    setPositionMap(manager.tick(1_000));
+    return createRafLoop(() => setPositionMap(manager.tick(3)));
+  }, [graph]);
 
   const viewBox = useMemo(() => {
     const rawBounds = calculateBounds([...positionMap.values()]);
@@ -46,8 +40,8 @@ export const GraphViz: FunctionComponent<{ graph: Graph<string> }> = ({
   }, [positionMap]);
 
   return (
-    <svg viewBox={viewBox} width={500}>
-      {[...graph.edges()].map(([source, target]) => (
+    <svg viewBox={viewBox} height={900}>
+      {[...positionManager.graph.edges()].map(([source, target]) => (
         <GraphVizArrow
           key={`${source}::${target}`}
           start={positionMap.get(source)}
@@ -55,7 +49,7 @@ export const GraphViz: FunctionComponent<{ graph: Graph<string> }> = ({
         />
       ))}
 
-      {[...graph.nodes()].map((node) => (
+      {[...positionManager.graph.nodes()].map((node) => (
         <GraphVizNode key={node} id={node} position={positionMap.get(node)} />
       ))}
     </svg>

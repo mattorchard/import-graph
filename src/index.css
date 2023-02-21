@@ -74,16 +74,22 @@ textarea {
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
-.app__content {
+.chains__content {
   max-height: 100%;
   overflow: hidden;
   display: grid;
   gap: 0.5rem;
   grid-template-rows: auto 1fr;
 }
+.other__content {
+  display: flex;
+  justify-content: center;
+  max-height: 100%;
+  overflow: auto;
+}
 .app__footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0.5rem;
 }
 
@@ -123,7 +129,7 @@ input[type="checkbox"] {
   color: var(--color-primary);
   margin-right: 0.5rem;
 }
-.walk__item__path {
+.doc-path__folder {
   color: var(--color-text-subtle);
 }
 .search-form {
@@ -188,4 +194,19 @@ dialog {
 
 ::selection {
   background-color: var(--color-selection);
+}
+
+.nav-list {
+  display: flex;
+  gap: 0.5rem;
+}
+a {
+  color: inherit;
+}
+
+.nav-link {
+  text-transform: capitalize;
+}
+.nav-link--current {
+  color: var(--color-primary);
 }

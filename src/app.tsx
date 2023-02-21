@@ -1,29 +1,45 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { AliasDialog } from "./components/AliasDialog";
+import { FileTree } from "./components/FileTree";
+import { GraphViz } from "./components/GraphViz";
+import { NavLinks } from "./components/NavLinks";
 import { SearchForm } from "./components/SearchForm";
 import { WalkList } from "./components/WalkList";
 
-import { buildSearchableWalks, Doc } from "./helpers/DomainHelpers";
+import { createJunk, Doc } from "./helpers/DomainHelpers";
 import { exportDocs } from "./helpers/ExportHelpers";
 import {
   createWalkFilter,
   EmptyQueryRecord,
   QueryRecord,
 } from "./helpers/SearchHelpers";
+import { usePage } from "./hooks/usePage";
+import { Graph } from "./utilities/Graph";
 import { AliasMap } from "./utilities/ImportResolver";
+import { TreeMap } from "./utilities/TreeMap";
 
 export function App() {
-  const [root, setRoot] = useState<FileSystemDirectoryHandle | null>(null);
-  const [allDocWalks, setAllDocWalks] = useState<Doc[][] | null>(null);
-  const [queries, setQueries] = useState<QueryRecord>(EmptyQueryRecord);
+  const [rootHandle, setRootHandle] =
+    useState<FileSystemDirectoryHandle | null>(null);
   const [isAliasDialogOpen, setIsAliasDialogOpen] = useState(false);
   const [rootAliases, setRootAliases] = useState<AliasMap>(new Map());
-  const [isPathVisible, setIsPathVisible] = useState(true);
+  const [isFolderVisible, setIsFolderVisible] = useState(true);
+  const [queries, setQueries] = useState<QueryRecord>(EmptyQueryRecord);
+  const [page] = usePage();
+  const [allDocWalks, setAllDocWalks] = useState<Doc[][] | null>(null);
+  const [importGraph, setImportGraph] = useState<Graph<string> | null>(null);
+  const [docTree, setDocTree] = useState<TreeMap<string, Doc> | null>(null);
 
   useEffect(() => {
-    if (!root) return;
-    buildSearchableWalks(root, rootAliases).then(setAllDocWalks);
-  }, [root, rootAliases]);
+    if (!rootHandle) return;
+    createJunk(rootHandle, rootAliases).then(
+      ({ searchableWalks, importGraph, docTree }) => {
+        setAllDocWalks(searchableWalks);
+        setImportGraph(importGraph);
+        setDocTree(docTree);
+      }
+    );
+  }, [rootHandle, rootAliases]);
 
   const walkFilter = useMemo(() => createWalkFilter(queries), [queries]);
 
@@ -31,11 +47,15 @@ export function App() {
     if (!allDocWalks) return null;
     if (!walkFilter) return allDocWalks;
     return allDocWalks.filter(walkFilter);
-  }, [allDocWalks, queries]);
+  }, [allDocWalks, walkFilter]);
+
+  useEffect(() => {
+    setQueries(EmptyQueryRecord);
+  }, [page]);
 
   const handlePickFolder = async () => {
-    setAllDocWalks(null);
-    setRoot(await window.showDirectoryPicker());
+    setRootHandle(null);
+    setRootHandle(await window.showDirectoryPicker());
   };
 
   return (
@@ -53,42 +73,65 @@ export function App() {
             <label>
               <input
                 type="checkbox"
-                checked={isPathVisible}
-                onChange={(e) => setIsPathVisible(e.currentTarget.checked)}
+                checked={isFolderVisible}
+                onChange={(e) => setIsFolderVisible(e.currentTarget.checked)}
               />
-              Show paths
+              Show folders
             </label>
             <button type="button" onClick={() => setIsAliasDialogOpen(true)}>
               Configure aliases
             </button>
-
             <button type="button" onClick={() => exportDocs(filteredWalks)}>
               Download
             </button>
-
             <button type="button" onClick={handlePickFolder}>
               Choose a different folder
             </button>
           </div>
         )}
       </header>
-      <main className="app__content">
-        {root ? <SearchForm onChange={setQueries} /> : <div />}
-        {filteredWalks ? (
-          <WalkList walks={filteredWalks} isPathVisible={isPathVisible} />
-        ) : (
-          <div className="hero__container" onClick={handlePickFolder}>
-            <button type="button" className="hero__button">
-              Choose a folder
-            </button>
+      {rootHandle ? (
+        <>
+          {page === "chains" && (
+            <main className="chains__content">
+              <SearchForm onChange={setQueries} />
+              {filteredWalks && (
+                <WalkList
+                  walks={filteredWalks}
+                  isFolderVisible={isFolderVisible}
+                />
+              )}
+            </main>
+          )}
+          {page === "graph" && rootHandle && importGraph && (
+            <main className="other__content">
+              <GraphViz graph={importGraph} />
+            </main>
+          )}
+          {page === "files" && docTree && (
+            <main className="other__content">
+              <FileTree tree={docTree} />
+            </main>
+          )}
+        </>
+      ) : (
+        <div className="hero__container" onClick={handlePickFolder}>
+          <button type="button" className="hero__button">
+            Choose a folder
+          </button>
+        </div>
+      )}
+
+      <footer className="app__footer">
+        {rootHandle && <NavLinks />}
+        {page === "chains" && (
+          <div>
+            {allDocWalks !== filteredWalks && filteredWalks && (
+              <>{filteredWalks.length}&nbsp;/&nbsp;</>
+            )}
+            {allDocWalks && <>{allDocWalks.length} Chains</>}
           </div>
         )}
-      </main>
-      <footer className="app__footer">
-        {allDocWalks !== filteredWalks && filteredWalks && (
-          <>{filteredWalks.length}&nbsp;/&nbsp;</>
-        )}
-        {allDocWalks && <>{allDocWalks.length} Chains</>}
       </footer>
     </div>
   );
