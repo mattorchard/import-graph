@@ -1,13 +1,20 @@
 import { Doc } from "./DomainHelpers";
+import { segmentLines } from "./TextHelpers";
 
 const createDocCondition = (query: string): ((doc: Doc) => boolean) => {
-  const querySegments = query
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const querySegments = segmentLines(query);
   if (query.length === 0) return () => true;
 
-  const patterns = querySegments.map((segment) => new RegExp(segment, "i"));
+  const patterns = querySegments.map((segment) => {
+    try {
+      return new RegExp(segment, "i");
+    } catch {
+      console.warn(`Invalid regex, usign literal search`, segment);
+      return {
+        test: (value: string) => segment.includes(value),
+      };
+    }
+  });
   return (doc) => patterns.some((pattern) => pattern.test(doc.searchTarget));
 };
 

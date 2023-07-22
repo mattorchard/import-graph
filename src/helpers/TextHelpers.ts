@@ -5,3 +5,18 @@ export const countChar = (text: string, searchChar: string) => {
   }
   return count;
 };
+
+export const segmentLines = (text: string) =>
+  text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+export const isValidRegex = (text: string, flags?: string) => {
+  try {
+    new RegExp(text, flags);
+    return true;
+  } catch {
+    return false;
+  }
+};
