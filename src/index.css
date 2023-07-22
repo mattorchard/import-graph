@@ -128,7 +128,7 @@ input[type="checkbox"] {
   white-space: pre;
 }
 .walk__item + .walk__item::before {
-  content: "🠪";
+  content: "-";
   color: var(--color-primary);
   margin-right: 0.5rem;
 }
