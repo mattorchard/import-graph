@@ -17,6 +17,7 @@ import { usePage } from "./hooks/usePage";
 import { Graph } from "./utilities/Graph";
 import { AliasMap } from "./utilities/ImportResolver";
 import { TreeMap } from "./utilities/TreeMap";
+import { useJsonMemo } from "./hooks/useJsonMemo";
 
 export function App() {
   const [rootHandle, setRootHandle] =
@@ -24,11 +25,13 @@ export function App() {
   const [isAliasDialogOpen, setIsAliasDialogOpen] = useState(false);
   const [rootAliases, setRootAliases] = useState<AliasMap>(new Map());
   const [isFolderVisible, setIsFolderVisible] = useState(true);
-  const [queries, setQueries] = useState<QueryRecord>(EmptyQueryRecord);
+  const [rawQueries, setRawQueries] = useState<QueryRecord>(EmptyQueryRecord);
   const [page] = usePage();
   const [allDocWalks, setAllDocWalks] = useState<Doc[][] | null>(null);
   const [importGraph, setImportGraph] = useState<Graph<string> | null>(null);
   const [docTree, setDocTree] = useState<TreeMap<string, Doc> | null>(null);
+
+  const queries = useJsonMemo(rawQueries);
 
   useEffect(() => {
     if (!rootHandle) return;
@@ -37,7 +40,7 @@ export function App() {
         setAllDocWalks(searchableWalks);
         setImportGraph(importGraph);
         setDocTree(docTree);
-      }
+      },
     );
   }, [rootHandle, rootAliases]);
 
@@ -50,7 +53,7 @@ export function App() {
   }, [allDocWalks, walkFilter]);
 
   useEffect(() => {
-    setQueries(EmptyQueryRecord);
+    setRawQueries(EmptyQueryRecord);
   }, [page]);
 
   const handlePickFolder = async () => {
@@ -94,7 +97,7 @@ export function App() {
         <>
           {page === "chains" && (
             <main className="chains__content">
-              <SearchForm onChange={setQueries} />
+              <SearchForm onChange={setRawQueries} />
               {filteredWalks && (
                 <WalkList
                   walks={filteredWalks}
