@@ -213,3 +213,9 @@ a {
 .nav-link--current {
   color: var(--color-primary);
 }
+
+.nis__message {
+  text-align: center;
+  font-size: 2rem;
+  padding: 0.5rem;
+}

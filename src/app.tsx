@@ -98,7 +98,10 @@ export function App() {
           {page === "chains" && (
             <main className="chains__content">
               <SearchForm onChange={setRawQueries} />
-              {filteredWalks && (
+              {filteredWalks?.length === 0 && (
+                <p className="nis__message">No results</p>
+              )}
+              {filteredWalks && filteredWalks.length > 1 && (
                 <WalkList
                   walks={filteredWalks}
                   isFolderVisible={isFolderVisible}
