@@ -10,7 +10,6 @@ export const SearchForm: FunctionComponent<{
   const onChangeHandlers = useMemo(
     () =>
       createDebounced((form: HTMLFormElement) => {
-        console.debug("Searching");
         const formData = new FormData(form);
         onChange({
           start: (formData.get("start") as string) || "",
