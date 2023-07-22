@@ -3,7 +3,7 @@
   --color-text-subtle: rgba(255, 255, 255, 0.5);
   --color-background: #1e212b;
   --color-primary: #912f40;
-  --color-selection: #6e75a8;
+  --color-error: crimson;
 }
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -28,7 +28,10 @@
 html {
   font-size: 16px;
 }
-
+::selection {
+  /* css-var-no longer working */
+  background-color: #6e75a8;
+}
 .visually-hidden {
   clip: rect(1px, 1px, 1px, 1px);
   -webkit-clip-path: inset(50%);
@@ -193,11 +196,7 @@ dialog {
 }
 
 .search-form__search-input:invalid {
-  text-decoration: underline wavy crimson;
-}
-
-::selection {
-  background-color: var(--color-selection);
+  text-decoration: underline wavy var(--color-error);
 }
 
 .nav-list {
