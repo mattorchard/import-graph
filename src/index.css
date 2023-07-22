@@ -192,6 +192,10 @@ dialog {
   max-height: calc(1.5rem + 2rem * 10);
 }
 
+.search-form__search-input:invalid {
+  text-decoration: underline wavy crimson;
+}
+
 ::selection {
   background-color: var(--color-selection);
 }

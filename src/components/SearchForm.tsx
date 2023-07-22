@@ -1,7 +1,7 @@
 import { FunctionComponent } from "preact";
 import { useMemo } from "preact/hooks";
 import { QueryRecord } from "../helpers/SearchHelpers";
-import { countChar } from "../helpers/TextHelpers";
+import { countChar, isValidRegex, segmentLines } from "../helpers/TextHelpers";
 import { createDebounced } from "../helpers/TimingHelpers";
 
 export const SearchForm: FunctionComponent<{
@@ -10,6 +10,7 @@ export const SearchForm: FunctionComponent<{
   const onChangeHandlers = useMemo(
     () =>
       createDebounced((form: HTMLFormElement) => {
+        console.debug("Searching");
         const formData = new FormData(form);
         onChange({
           start: (formData.get("start") as string) || "",
@@ -17,7 +18,7 @@ export const SearchForm: FunctionComponent<{
           end: (formData.get("end") as string) || "",
         });
       }, 300),
-    [onChange]
+    [onChange],
   );
   return (
     <form
@@ -27,10 +28,7 @@ export const SearchForm: FunctionComponent<{
         onChangeHandlers.immediate(e.currentTarget);
       }}
       onBlur={(e) => onChangeHandlers.immediate(e.currentTarget)}
-      onChange={(e) => {
-        console.debug("Change events");
-        return onChangeHandlers.immediate(e.currentTarget);
-      }}
+      onChange={(e) => onChangeHandlers.immediate(e.currentTarget)}
       onInput={(e) => onChangeHandlers.debounced(e.currentTarget)}
     >
       <SearchInput label="Start" />
@@ -47,8 +45,15 @@ const SearchInput: FunctionComponent<{ label: string }> = ({ label }) => (
     aria-label={label}
     placeholder={label}
     onInput={(e) => {
-      const lineCount = 1 + countChar(e.currentTarget.value, "\n");
-      e.currentTarget.style.setProperty("--line-count", lineCount.toString());
+      const { value, style } = e.currentTarget;
+      const lineCount = 1 + countChar(value, "\n");
+      style.setProperty("--line-count", lineCount.toString());
+
+      const segments = segmentLines(value);
+      const containsInvalidRegex = segments.some((seg) => !isValidRegex(seg));
+      e.currentTarget.setCustomValidity(
+        containsInvalidRegex ? "Invalid regex" : "",
+      );
     }}
   />
 );
