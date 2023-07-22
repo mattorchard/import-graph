@@ -29,13 +29,13 @@ export function VirtualizedList<ItemType>({
 
   const startIndex = Math.max(0, firstVisibleIndex - bumperCount);
   const endIndex = Math.min(
-    items.length - 1,
-    firstVisibleIndex + itemsOnScreen + bumperCount
+    items.length,
+    firstVisibleIndex + itemsOnScreen + bumperCount,
   );
 
   const itemsToRender = useMemo(
     () => items.slice(startIndex, endIndex),
-    [items, startIndex, endIndex]
+    [items, startIndex, endIndex],
   );
 
   return (
@@ -97,5 +97,5 @@ const VirtualizedListInner = memo(
         ))}
       </ListElement>
     );
-  }
+  },
 );
